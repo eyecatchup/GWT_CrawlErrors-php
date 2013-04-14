@@ -15,6 +15,10 @@ To get started, the steps are as follows:
  - Download the php file <a target="_blank" href="https://raw.github.com/eyecatchup/GWT_CrawlErrors-php/master/GwtCrawlErrors.class.php.php">`GwtCrawlErrors.class.php`</a>.
  - Create a folder and add the <a target="_blank" href="https://raw.github.com/eyecatchup/GWT_CrawlErrors-php/master/GwtCrawlErrors.class.php.php">`GwtCrawlErrors.class.php`</a> script to it.
 
+### Note
+
+This class will download <strong>all</strong> crawl errors that are currently listed for a domain in Webmaster Tools. Depending on your domain, this can be a lot of data. The csv file size for 25k crawl errors, for example, is somewhere between 5 and 8 Mb. So, please consider that processes may take some time!
+ 
 ### Example 1 - Download via browser
 
 To download CSV data for a single domain name via a web browser, the steps are as follows:
