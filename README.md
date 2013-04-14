@@ -86,14 +86,14 @@ catch (Exception $e) {
 }
 ```
 
-This will create one CSV file named `gwt-crawlerrors-www.domain.com-YYYYmmdd-H:i:s.csv` in the specified path.
+This will create one CSV file named `gwt-crawlerrors-www.domain.com-YYYYmmdd-His.csv` in the specified path.
 
 
 ### Example 3 - Bulk downloads
 
 To download CSV data for each domain connected to the Google WMT account to the local file system (eg. when executing from command line), the steps are as follows:
 
- - In the same folder where you added the `GwtCrawlErrors.class.php`, create and run the following PHP script.<br>_You'll need to replace the example values for "mail" and "pass" with valid login details for your Google Account and for "domain" with a valid URL for a site registered in your GWT account._
+ - In the same folder where you added the `GwtCrawlErrors.class.php`, create and run the following PHP script.<br>_You'll need to replace the example values for "mail" and "pass" with valid login details for your Google Account._
 
 ```php
 <?php
@@ -114,6 +114,8 @@ try {
         // iterate over all connected domains
         $sites = $gwtCrawlErrors->getSites();
         foreach($sites as $domain) {
+            // use an absolute path without trailing slash as
+            // a second parameter, to write data to file system.
             $gwtCrawlErrors->getCsv($domain, __DIR__);
         }
 
@@ -124,7 +126,7 @@ catch (Exception $e) {
 }
 ```
 
-This will create a CSV file named `gwt-crawlerrors-www.domain.com-YYYYmmdd-H:i:s.csv`, for each domain connected to the Google WMT account, in the specified path.
+This will create a CSV file named `gwt-crawlerrors-www.domain.com-YYYYmmdd-His.csv`, for each domain connected to the Google WMT account, in the specified path.
 
 ## License
 

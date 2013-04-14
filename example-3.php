@@ -15,7 +15,9 @@ try {
     if ($gwtCrawlErrors->login($mail, $pass)) {
         // iterate over all connected domains
         $sites = $gwtCrawlErrors->getSites();
-        foreach($sites as $domain) {
+        foreach ($sites as $domain) {
+            // use an absolute path without trailing slash as
+            // a second parameter, to write data to file system.
             $gwtCrawlErrors->getCsv($domain, __DIR__);
         }
 

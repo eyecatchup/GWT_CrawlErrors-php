@@ -2,6 +2,7 @@
 ini_set('max_execution_time', 600);
 ini_set('memory_limit', '64M');
 
+
 /** GwtCrawlErrors
  *  ================================================================================
  *  PHP class to download crawl errors from Google webmaster tools as csv.
@@ -10,7 +11,7 @@ ini_set('memory_limit', '64M');
  *  @package     GwtCrawlErrors
  *  @copyright   2013 - present, Stephan Schmitz
  *  @license     http://eyecatchup.mit-license.org
- *  @version     CVS: $Id: GwtCrawlErrors.class.php, v1.0.0 Rev 7 2013/04/14 17:08:17 ssc Exp $
+ *  @version     CVS: $Id: GwtCrawlErrors.class.php, v1.0.0 Rev 10 2013/04/14 19:15:43 ssc Exp $
  *  @author      Stephan Schmitz <eyecatchup@gmail.com>
  *  @link        https://github.com/eyecatchup/GWT_CrawlErrors-php/
  *  ================================================================================
@@ -40,51 +41,63 @@ class GwtCrawlErrors
 
     public function __construct()
     {
-        $this->_auth     = false;
-        $this->_loggedIn = false;
-        $this->_domain   = false;
-        $this->_data     = array();
+        $this->_auth = $this->_loggedIn = $this->_domain = false;
+        $this->_data = array();
     }
 
     public function getArray($domain)
     {
-        $this->_domain = $domain;
-        return false !== $this->_prepareData() ? $this->_data() : false;
+        if ($this->_validateDomain($domain)) {
+            if ($this->_prepareData()) {
+                return $this->_data();
+            }
+            else {
+                throw new Exception('Error receiving crawl issues for ' . $domain);
+            }
+        }
+        else {
+            throw new Exception('The given domain is not connected to your Webmastertools account!');
+            exit;
+        }
     }
 
     public function getCsv($domain, $localPath = false)
     {
-        $this->_domain = $domain;
-        if (false !== $this->_prepareData()) {
-            if (!$localPath) {
-                $this->_HttpHeaderCSV();
-                $this->_outputCSV();
+        if ($this->_validateDomain($domain)) {
+            if ($this->_prepareData()) {
+                if (!$localPath) {
+                    $this->_HttpHeaderCSV();
+                    $this->_outputCSV();
+                }
+                else {
+                    $this->_outputCSV($localPath);
+                }
             }
             else {
-                $this->_outputCSV($localPath);
+                throw new Exception('Error receiving crawl issues for ' . $domain);
             }
         }
         else {
-            return false;
+            throw new Exception('The given domain is not connected to your Webmastertools account!');
+            exit;
         }
     }
 
     public function getSites()
     {
-        if(true === $this->_loggedIn) {
+        if($this->_loggedIn) {
             $feed = $this->_getData('feeds/sites/');
-            if($feed !== false) {
-                $sites = array();
-
+            if ($feed) {
                 $doc = new DOMDocument();
                 $doc->loadXML($feed);
 
+                $sites = array();
                 foreach ($doc->getElementsByTagName('entry') as $node) {
                     array_push($sites,
                       $node->getElementsByTagName('title')->item(0)->nodeValue);
                 }
 
-                return $sites;
+                return (0 < sizeof($sites)) ? $sites : false;
             }
             else {
                 return false;
@@ -95,12 +108,12 @@ class GwtCrawlErrors
         }
     }
 
-    public function login($email, $pwd)
+    public function login($mail, $pass)
     {
         $postRequest = array(
             'accountType' => 'HOSTED_OR_GOOGLE',
-            'Email'       => $email,
-            'Passwd'      => $pwd,
+            'Email'       => $mail,
+            'Passwd'      => $pass,
             'service'     => "sitemaps",
             'source'      => "Google-WMTdownloadscript-0.11-php"
         );
@@ -120,7 +133,8 @@ class GwtCrawlErrors
         curl_close($ch);
 
         if (200 != $info['http_code']) {
-            return false;
+            throw new Exception('Login failed!');
+            exit;
         }
         else {
             @preg_match('/Auth=(.*)/', $output, $match);
@@ -130,14 +144,15 @@ class GwtCrawlErrors
                 return true;
             }
             else {
-                return false;
+                throw new Exception('Login failed!');
+                exit;
             }
         }
     }
 
     private function _prepareData()
     {
-        if (true === $this->_loggedIn) {
+        if ($this->_loggedIn) {
             $currentIndex = 1;
             $maxResults   = 100;
 
@@ -169,7 +184,7 @@ class GwtCrawlErrors
             else {
                 // Csv data headline
                 $this->_data = Array(
-                    Array('Issue Id', 'Crawl type', 'Issue type', 'Detail', 'URL', 'Date detected', 'Updated')
+                    Array('Issue Id', 'Crawl type', 'Issue type', 'Detail', 'URL', 'Date detected', 'Last detected')
                 );
 
                 while ($currentIndex <= $resultPages) {
@@ -211,7 +226,7 @@ class GwtCrawlErrors
 
     private function _getData($url)
     {
-        if (true === $this->_loggedIn) {
+        if ($this->_loggedIn) {
             $header = array(
                 'Authorization: GoogleLogin auth=' . $this->_auth,
                 'GData-Version: 2'
@@ -261,5 +276,26 @@ class GwtCrawlErrors
         return 'gwt-crawlerrors-' .
             parse_url($this->_domain, PHP_URL_HOST) .'-'.
             date('Ymd-His') . '.csv';
+    }
+
+    private function _validateDomain($domain)
+    {
+        if (!filter_var($domain, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        $sites = $this->getSites();
+        if (!$sites) {
+            return false;
+        }
+
+        foreach ($sites as $url) {
+            if (parse_url($domain, PHP_URL_HOST) == parse_url($url, PHP_URL_HOST)) {
+                $this->_domain = $domain;
+                return true;
+            }
+        }
+
+        return false;
     }
 }
