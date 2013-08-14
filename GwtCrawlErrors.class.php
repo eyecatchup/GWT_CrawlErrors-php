@@ -11,7 +11,7 @@ ini_set('memory_limit', '64M');
  *  @package     GwtCrawlErrors
  *  @copyright   2013 - present, Stephan Schmitz
  *  @license     http://eyecatchup.mit-license.org
- *  @version     CVS: $Id: GwtCrawlErrors.class.php, v1.0.0 Rev 10 2013/04/14 19:15:43 ssc Exp $
+ *  @version     CVS: $Id: GwtCrawlErrors.class.php, v1.0.1 Rev 10 2013/08/14 23:15:43 ssc Exp $
  *  @author      Stephan Schmitz <eyecatchup@gmail.com>
  *  @link        https://github.com/eyecatchup/GWT_CrawlErrors-php/
  *  ================================================================================
@@ -117,6 +117,12 @@ class GwtCrawlErrors
             'service'     => "sitemaps",
             'source'      => "Google-WMTdownloadscript-0.11-php"
         );
+
+        // Before PHP version 5.2.0, send data in
+        // CURLOPT_POSTFIELDS as urlencoded string.
+        if (version_compare(PHP_VERSION, '5.2.0') < 0) {
+            $postRequest = http_build_query($postRequest);
+        }
 
         $ch = curl_init(self::HOST . '/accounts/ClientLogin');
         curl_setopt_array($ch, array(
