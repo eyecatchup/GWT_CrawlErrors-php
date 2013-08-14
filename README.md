@@ -12,8 +12,8 @@ This document explains how to automate the file download process from Google Web
 
 To get started, the steps are as follows:
 
- - Download the php file <a target="_blank" href="https://raw.github.com/eyecatchup/GWT_CrawlErrors-php/master/GwtCrawlErrors.class.php.php">`GwtCrawlErrors.class.php`</a>.
- - Create a folder and add the <a target="_blank" href="https://raw.github.com/eyecatchup/GWT_CrawlErrors-php/master/GwtCrawlErrors.class.php.php">`GwtCrawlErrors.class.php`</a> script to it.
+ - Download the php file <a target="_blank" href="https://raw.github.com/eyecatchup/GWT_CrawlErrors-php/master/GwtCrawlErrors.class.php">`GwtCrawlErrors.class.php`</a>.
+ - Create a folder and add the <a target="_blank" href="https://raw.github.com/eyecatchup/GWT_CrawlErrors-php/master/GwtCrawlErrors.class.php">`GwtCrawlErrors.class.php`</a> script to it.
 
 ### Note
 
