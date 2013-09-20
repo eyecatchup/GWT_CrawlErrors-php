@@ -270,8 +270,10 @@ class GwtCrawlErrors
     private function _outputCSV($localPath = false) {
         $outstream = !$localPath ? 'php://output' : $localPath . DIRECTORY_SEPARATOR . $this->_getFilename();
         $outstream = fopen($outstream, "w");
-        function __outputCSV(&$vals, $key, $filehandler) {
-            fputcsv($filehandler, $vals); // add parameters if you want
+        if (!function_exists('__outputCSV')) {
+            function __outputCSV(&$vals, $key, $filehandler) {
+                fputcsv($filehandler, $vals); // add parameters if you want
+            }
         }
         array_walk($this->_data, "__outputCSV", $outstream);
         fclose($outstream);
