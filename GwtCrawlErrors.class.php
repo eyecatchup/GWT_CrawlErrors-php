@@ -49,7 +49,7 @@ class GwtCrawlErrors
     {
         if ($this->_validateDomain($domain)) {
             if ($this->_prepareData()) {
-                return $this->_data();
+                return $this->_data;
             }
             else {
                 throw new Exception('Error receiving crawl issues for ' . $domain);
